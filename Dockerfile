@@ -20,7 +20,7 @@ RUN set -x \
 # get codes
 RUN git clone https://github.com/api7/apisix-plugin-template.git \
     && cd apisix-plugin-template \
-    && sudo sed -i "s@release/2.12@${APISIX_VERSION}@" t/APISIX.pm \
+    && sudo sed -i "s@release/2.12@${APISIX_VERSION}@" ci/utils/linux-common-runnner.sh \
     && make init_apisix \
     && make patch_apisix \
     && cd workbench \
