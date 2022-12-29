@@ -10,7 +10,7 @@ WORKDIR /opt
 RUN set -x \
     && (test "${ENABLE_PROXY}" != "true" || /bin/sed -i 's,http://deb.debian.org,http://mirrors.aliyun.com,g' /etc/apt/sources.list) \
     && apt-get -y update --fix-missing \
-    && apt-get install -y curl gawk git libldap2-dev liblua5.1-0-dev lua5.1 make sudo unzip wget procps \
+    && apt-get install -y curl gawk git openresty-openssl111-dev libldap2-dev liblua5.1-0-dev lua5.1 make sudo unzip wget procps \
     && apt-get install -y cpanminus build-essential libncurses5-dev libreadline-dev libssl-dev perl libpcre3 libpcre3-dev \
     && sudo ln -s /lib/x86_64-linux-gnu/libpcre.so.3 /usr/lib/libpcre.so \
     && cpanm --notest Test::Nginx >build.log 2>&1 || (cat build.log && exit 1) \
