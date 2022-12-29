@@ -6,7 +6,7 @@ if pgrep etcd > /dev/null;then
     echo "ETCD Start success"
 fi
 
-if [[ -d /opt/custom-project ]];then
+if [[ not -d /opt/custom-project ]];then
 else
     mkdir -p /opt/custom-project
 fi
