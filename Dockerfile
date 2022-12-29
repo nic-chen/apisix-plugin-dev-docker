@@ -10,12 +10,14 @@ WORKDIR /opt
 RUN set -x \
     && (test "${ENABLE_PROXY}" != "true" || /bin/sed -i 's,http://deb.debian.org,http://mirrors.aliyun.com,g' /etc/apt/sources.list) \
     && apt-get -y update --fix-missing \
-    && apt-get install -y curl gawk git libldap2-dev liblua5.1-0-dev lua5.1 make sudo unzip wget procps \
+    && apt-get install -y curl gawk git libldap2-dev liblua5.1-0-dev lua5.1 make sudo unzip wget procps software-properties-common \
     && apt-get install -y cpanminus build-essential libncurses5-dev libreadline-dev libssl-dev perl libpcre3 libpcre3-dev \
-    && add-apt-repository -y "deb http://openresty.org/package/arm64/debian $(lsb_release -sc) openresty" \
+    && arch=$(uname -m | tr '[:upper:]' '[:lower:]') \
+    && add-apt-repository -y "deb http://openresty.org/package/${arch_path}debian $(lsb_release -sc) openresty" \
+    && apt-get -y update --fix-missing \
     && apt-get install -y openresty-openssl111-dev \
     && sudo ln -s /lib/x86_64-linux-gnu/libpcre.so.3 /usr/lib/libpcre.so \
-    && cpanm --notest Test::Nginx >build.log 2>&1 || (cat build.log && exit 1) \
+    && cpanm --notest Test::Nginx > build.log 2>&1 || (cat build.log && exit 1) \
     && apt-get remove --purge --auto-remove -y \
     && curl https://raw.githubusercontent.com/apache/apisix/master/utils/linux-install-luarocks.sh -sL | bash -
 
