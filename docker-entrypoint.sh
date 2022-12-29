@@ -10,7 +10,7 @@ if [[ ! -d /opt/custom-project ]];then
     mkdir -p /opt/custom-project
 fi
 
-cp -r /opt/custom-project/. /opt/apisix
+cd /opt/custom-project/ && cp -R $(ls | grep -v '^Makefile$') /opt/apisix
 
 
 echo "Found apisix source code in /opt/apisix, make init, Plz Wait..."
