@@ -11,8 +11,9 @@ RUN set -x \
     && (test "${ENABLE_PROXY}" != "true" || /bin/sed -i 's,http://deb.debian.org,http://mirrors.aliyun.com,g' /etc/apt/sources.list) \
     && apt-get -y update --fix-missing \
     && apt-get install -y curl gawk git libldap2-dev liblua5.1-0-dev lua5.1 make sudo unzip wget procps software-properties-common \
-    && apt-get install -y cpanminus build-essential libncurses5-dev libreadline-dev libssl-dev perl libpcre3 libpcre3-dev \
+    && apt-get install -y cpanminus lsb-release build-essential libncurses5-dev libreadline-dev libssl-dev perl libpcre3 libpcre3-dev \
     && arch=$(uname -m | tr '[:upper:]' '[:lower:]') \
+    && wget -qO - https://openresty.org/package/pubkey.gpg | sudo apt-key add - \
     && add-apt-repository -y "deb http://openresty.org/package/${arch_path}debian $(lsb_release -sc) openresty" \
     && apt-get -y update --fix-missing \
     && apt-get install -y openresty-openssl111-dev \
