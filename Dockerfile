@@ -12,15 +12,10 @@ RUN set -x \
     && apt-get -y update --fix-missing \
     && apt-get install -y curl gawk git libldap2-dev liblua5.1-0-dev lua5.1 make sudo unzip wget procps software-properties-common \
     && apt-get install -y cpanminus lsb-release build-essential libncurses5-dev libreadline-dev libssl-dev perl libpcre3 libpcre3-dev \
-    && arch=$(uname -m | tr '[:upper:]' '[:lower:]') \
-    && wget -qO - https://openresty.org/package/pubkey.gpg | sudo apt-key add - \
-    && add-apt-repository -y "deb http://openresty.org/package/${arch_path}debian $(lsb_release -sc) openresty" \
-    && apt-get -y update --fix-missing \
-    && apt-get install -y openresty-openssl111-dev \
     && sudo ln -s /lib/x86_64-linux-gnu/libpcre.so.3 /usr/lib/libpcre.so \
     && cpanm --notest Test::Nginx > build.log 2>&1 || (cat build.log && exit 1) \
     && apt-get remove --purge --auto-remove -y \
-    && curl https://raw.githubusercontent.com/apache/apisix/master/utils/linux-install-luarocks.sh -sL | bash -
+    && curl https://raw.githubusercontent.com/apache/apisix/master/utils/install-dependencies.sh -sL | bash -
 
 # get codes
 RUN git clone https://github.com/api7/apisix-plugin-template.git \
