@@ -2,6 +2,9 @@ FROM api7/apisix-base:dev AS build
 
 ARG ENABLE_PROXY=false
 ARG APISIX_VERSION=release/2.13
+ARG TARGETPLATFORM=x86_64
+ARG DOCKER_CHANNEL=stable
+ARG DOCKER_VERSION=20.10.8
 
 ENV DEBIAN_FRONTEND noninteractive
 ENV TEST_NGINX_BINARY=/usr/local/openresty-debug/bin/openresty
@@ -29,6 +32,7 @@ RUN wget -O etcd-v3.5.6-linux-amd64.tar.gz https://github.com/etcd-io/etcd/relea
 RUN curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose \
     && chmod +x /usr/local/bin/docker-compose
 
+# https://download.docker.com/linux/static///docker-.tgz
 # install docker
 RUN set -vx; \
     export ARCH=$(echo ${TARGETPLATFORM} | cut -d / -f2) \
