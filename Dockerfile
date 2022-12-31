@@ -4,6 +4,7 @@ ARG ENABLE_PROXY=false
 ARG APISIX_VERSION=release/2.13
 
 ENV DEBIAN_FRONTEND noninteractive
+ENV TEST_NGINX_BINARY=/usr/local/openresty-debug/bin/openresty
 
 WORKDIR /opt
 
@@ -17,20 +18,6 @@ RUN set -x \
     && apt-get remove --purge --auto-remove -y \
     && curl https://raw.githubusercontent.com/apache/apisix/master/utils/install-dependencies.sh -sL | bash -
 
-# get codes
-RUN git clone https://github.com/api7/apisix-plugin-template.git \
-    && cd apisix-plugin-template \
-    && sudo sed -i "s@release/2.12@${APISIX_VERSION}@" ci/utils/linux-common-runnner.sh \
-    && make init_apisix \
-    && make patch_apisix \
-    && cd workbench \
-    && git clone https://github.com/openresty/test-nginx.git test-nginx \
-    && make utils \
-    && cd ../ \
-    && mv ./workbench /opt/apisix \
-    && cd /opt/apisix \
-    && rm -rf /opt/apisix-plugin-template
-
 # install etcd
 RUN wget -O etcd-v3.5.6-linux-amd64.tar.gz https://github.com/etcd-io/etcd/releases/download/v3.5.6/etcd-v3.5.6-linux-amd64.tar.gz && \
     tar -xvf etcd-v3.5.6-linux-amd64.tar.gz && \
@@ -38,7 +25,25 @@ RUN wget -O etcd-v3.5.6-linux-amd64.tar.gz https://github.com/etcd-io/etcd/relea
     cp -a etcd etcdctl /usr/bin/ && \
     rm -rf /opt/etcd-*
 
-# refresh project codes
+# install docker-compose
+RUN curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose \
+    && chmod +x /usr/local/bin/docker-compose
+
+# install docker
+RUN set -vx; \
+    export ARCH=$(echo ${TARGETPLATFORM} | cut -d / -f2) \
+    && if [ "$ARCH" = "arm64" ]; then export ARCH=aarch64 ; fi \
+    && if [ "$ARCH" = "amd64" ] || [ "$ARCH" = "i386" ]; then export ARCH=x86_64 ; fi \
+    && curl -f -L -o docker.tgz https://download.docker.com/linux/static/${DOCKER_CHANNEL}/${ARCH}/docker-${DOCKER_VERSION}.tgz \
+    && tar zxvf docker.tgz \
+    && install -o root -g root -m 755 docker/docker /usr/local/bin/docker \
+    && rm -rf docker docker.tgz \
+    && adduser --disabled-password --gecos "" --uid 1000 runner \
+    && groupadd docker \
+    && usermod -aG sudo runner \
+    && usermod -aG docker runner \
+    && echo "%sudo   ALL=(ALL:ALL) NOPASSWD:ALL" > /etc/sudoers
+
 COPY ./docker-entrypoint.sh /docker-entrypoint.sh
 
 ENTRYPOINT ["/docker-entrypoint.sh"]
